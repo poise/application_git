@@ -1,0 +1,4 @@
+--plugin classmethods
+--markup markdown
+--hide-api private
+--hide-void-return
