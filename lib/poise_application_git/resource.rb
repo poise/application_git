@@ -38,6 +38,8 @@ module PoiseApplicationGit
       @provider = PoiseApplicationGit::Provider
     end
 
+    attribute(:strict_ssh, equal_to: [true, false], default: false)
+
     def deploy_key(val=nil)
       if val
         # Set the wrapper script if we have a deploy key.
@@ -46,10 +48,6 @@ module PoiseApplicationGit
         val = SafeString.new(val) unless deploy_key_is_local?(val)
       end
       set_or_return(:deploy_key, val, kind_of: String)
-    end
-
-    def strict_ssh(val=nil)
-      set_or_return(:strict_ssh, val, equal_to: [true, false], default: false)
     end
 
     def ssh_wrapper_path
