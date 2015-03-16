@@ -16,3 +16,27 @@
 
 require 'serverspec'
 set :backend, :exec
+
+describe file('/opt/test1/README.md') do
+  it { is_expected.to be_a_file }
+  its(:content) { is_expected.to include('repo=test_repo') }
+  its(:content) { is_expected.to include('branch=master') }
+end
+
+describe file('/opt/test2/README.md') do
+  it { is_expected.to be_a_file }
+  its(:content) { is_expected.to include('repo=test_repo') }
+  its(:content) { is_expected.to include('branch=master') }
+end
+
+describe file('/opt/test3/README.md') do
+  it { is_expected.to be_a_file }
+  its(:content) { is_expected.to include('repo=test_repo') }
+  its(:content) { is_expected.to include('branch=release') }
+end
+
+describe file('/opt/test4/README.md') do
+  it { is_expected.to be_a_file }
+  its(:content) { is_expected.to include('repo=private_test_repo') }
+  its(:content) { is_expected.to include('branch=master') }
+end
