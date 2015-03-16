@@ -52,7 +52,7 @@ describe PoiseApplicationGit::Resource do
 
     it { is_expected.to sync_application_git('/test').with(repository: 'https://example.com/test.git', revision: 'd44ec06d0b2a87732e91c005ed2048c824fd63ed', deploy_key: '/etc/key', ssh_wrapper: File.expand_path('~root/.ssh/ssh_wrapper_2089348824')) }
     it { is_expected.to render_file(File.expand_path('~root/.ssh/ssh_wrapper_2089348824')).with_content(%Q{#!/bin/sh\n/usr/bin/env ssh -o "StrictHostKeyChecking=no" -i "/etc/key" $@\n}) }
-  end
+  end # /context with a local path to a deploy key
 
   context 'with strict SSH' do
     recipe do
@@ -67,5 +67,5 @@ describe PoiseApplicationGit::Resource do
 
     it { is_expected.to sync_application_git('/test').with(repository: 'https://example.com/test.git', revision: 'd44ec06d0b2a87732e91c005ed2048c824fd63ed', deploy_key: 'secretkey', ssh_wrapper: File.expand_path('~root/.ssh/ssh_wrapper_2089348824')) }
     it { is_expected.to render_file(File.expand_path('~root/.ssh/ssh_wrapper_2089348824')).with_content(%Q{#!/bin/sh\n/usr/bin/env ssh -i "#{File.expand_path('~root/.ssh/id_deploy_2089348824')}" $@\n}) }
-  end
+  end # /context with strict SSH
 end
