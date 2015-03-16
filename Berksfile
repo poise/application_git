@@ -23,4 +23,5 @@ cookbook 'application', gem: 'poise-application'
 
 group :test do
   cookbook 'application_git_test', path: 'test/cookbooks/application_git_test'
+  cookbook 'apt'
 end
