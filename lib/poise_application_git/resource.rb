@@ -40,6 +40,14 @@ module PoiseApplicationGit
 
     attribute(:strict_ssh, equal_to: [true, false], default: false)
 
+    def after_created
+      # Allow using the repository as the name in an application block.
+      if parent && !repository
+        destination(parent.path)
+        repository(name)
+      end
+    end
+
     def deploy_key(val=nil)
       if val
         # Set the wrapper script if we have a deploy key.

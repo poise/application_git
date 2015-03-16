@@ -68,4 +68,29 @@ describe PoiseApplicationGit::Resource do
     it { is_expected.to sync_application_git('/test').with(repository: 'https://example.com/test.git', revision: 'd44ec06d0b2a87732e91c005ed2048c824fd63ed', deploy_key: 'secretkey', ssh_wrapper: File.expand_path('~root/.ssh/ssh_wrapper_2089348824')) }
     it { is_expected.to render_file(File.expand_path('~root/.ssh/ssh_wrapper_2089348824')).with_content(%Q{#!/bin/sh\n/usr/bin/env ssh -i "#{File.expand_path('~root/.ssh/id_deploy_2089348824')}" $@\n}) }
   end # /context with strict SSH
+
+  context 'with an application path' do
+    recipe do
+      application '/app' do
+        application_git 'https://example.com/test.git' do
+          revision 'd44ec06d0b2a87732e91c005ed2048c824fd63ed'
+        end
+      end
+    end
+
+    it { is_expected.to sync_application_git('https://example.com/test.git').with(destination: '/app', repository: 'https://example.com/test.git', revision: 'd44ec06d0b2a87732e91c005ed2048c824fd63ed') }
+  end # /context with an application path
+
+  context 'with a short name' do
+    before do
+      expect_any_instance_of(PoiseApplicationGit::Provider).to receive(:remote_resolve_reference) {|instance| instance.new_resource.revision }
+    end
+    recipe do
+      application '/app' do
+        application_git 'https://example.com/test.git'
+      end
+    end
+
+    it { is_expected.to sync_application_git('https://example.com/test.git').with(destination: '/app', repository: 'https://example.com/test.git', revision: 'HEAD') }
+  end # /context with a short name
 end
