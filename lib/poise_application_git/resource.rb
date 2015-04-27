@@ -26,7 +26,7 @@ require 'poise_application_git/safe_string'
 
 module PoiseApplicationGit
   class Resource < Chef::Resource::Git
-    include Poise(parent: Chef::Resource::Application, parent_optional: true)
+    include Poise(parent: :application, parent_optional: true)
     provides(:application_git)
 
     def initialize(*args)
