@@ -16,7 +16,6 @@
 
 require 'spec_helper'
 
-
 describe PoiseApplicationGit::Resource do
   step_into(:application_git)
   recipe do

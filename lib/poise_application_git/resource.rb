@@ -80,7 +80,7 @@ module PoiseApplicationGit
     include Poise
     provides(:application_git)
 
-   def whyrun_supported?
+    def whyrun_supported?
       false # Just not dealing with this right now
     end
 
