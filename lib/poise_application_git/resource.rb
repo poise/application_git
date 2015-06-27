@@ -94,6 +94,8 @@ module PoiseApplicationGit
       super
     end
 
+    private
+
     def create_dotssh
       directory ::File.expand_path("~#{new_resource.user}/.ssh") do
         owner new_resource.user
@@ -122,6 +124,13 @@ module PoiseApplicationGit
         mode '700'
         content %Q{#!/bin/sh\n/usr/bin/env ssh #{'-o "StrictHostKeyChecking=no" ' unless new_resource.strict_ssh}-i "#{new_resource.deploy_key_path}" $@\n}
       end
+    end
+
+    # Patch back in the `#git` from the git provider. This otherwise conflicts
+    # with the `#git` defined by the DSL, which gets included in such a way
+    # that the DSL takes priority.
+    def git(*args, &block)
+      Chef::Provider::Git.instance_method(:git).bind(self).call(*args, &block)
     end
   end # /class Provider
 end
