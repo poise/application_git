@@ -40,5 +40,5 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency 'poise-boiler', '~> 1.0'
 
-  spec.metadata['halite_dependencies'] = 'git'
+  spec.metadata['halite_dependencies'] = 'git <= 4.2.2'
 end

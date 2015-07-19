@@ -19,6 +19,3 @@ require 'poise_application_git/resource'
 
 module PoiseApplicationGit
 end
-
-# What is even going on?
-Chef::Platform::ProviderPriorityMap.instance.priority(:git_client, [Chef::Provider::GitClient::Package]) if defined?(Chef::Provider::GitClient::Package)
