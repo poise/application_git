@@ -24,10 +24,24 @@ require 'poise_application_git/safe_string'
 
 
 module PoiseApplicationGit
+  # An `application_git` resource to clone application code from git.
+  #
+  # @since 1.0.0
+  # @provides application_git
+  # @action sync
+  # @action checkout
+  # @action export
+  # @example
+  #   application '/srv/myapp' do
+  #     git 'git@github.com:example/myapp.git' do
+  #       deploy_key data_bag_item('deploy_keys', 'myapp')['key']
+  #     end
+  #   end
   class Resource < Chef::Resource::Git
     include PoiseApplication::AppMixin
     provides(:application_git)
 
+    # @api private
     def initialize(*args)
       super
       # Because the superclass declares this, we have to as well. Should be
@@ -37,8 +51,12 @@ module PoiseApplicationGit
       @provider = PoiseApplicationGit::Provider
     end
 
+    # @!attribute strict_ssh
+    #   Enable strict SSH host key checking. Defaults to false.
+    #   @return [Boolean]
     attribute(:strict_ssh, equal_to: [true, false], default: false)
 
+    # @api private
     def after_created
       # Allow using the repository as the name in an application block.
       if parent && !repository
@@ -47,6 +65,9 @@ module PoiseApplicationGit
       end
     end
 
+    # @!attribute deploy_key
+    #   SSH deploy key as either a string value or a path to a key file.
+    #   @return [String]
     def deploy_key(val=nil)
       if val
         # Set the wrapper script if we have a deploy key.
@@ -57,15 +78,28 @@ module PoiseApplicationGit
       set_or_return(:deploy_key, val, kind_of: String)
     end
 
+    # Default SSH wrapper path.
+    #
+    # @api private
+    # @return [String]
     def ssh_wrapper_path
       @ssh_wrapper_path ||= ::File.expand_path("~#{user}/.ssh/ssh_wrapper_#{Zlib.crc32(name)}")
     end
 
+    # Guess if the deploy key is a local path or literal value.
+    #
+    # @api private
+    # @param key [String, nil] Key value to check. Defaults to self.key.
+    # @return [Boolean]
     def deploy_key_is_local?(key=nil)
       key ||= deploy_key
       key && key[0] == '/'
     end
 
+    # Path to deploy key.
+    #
+    # @api private
+    # @return [String]
     def deploy_key_path
       @deploy_key_path ||= if deploy_key_is_local?
         deploy_key
@@ -73,16 +107,26 @@ module PoiseApplicationGit
         ::File.expand_path("~#{user}/.ssh/id_deploy_#{Zlib.crc32(name)}")
       end
     end
-  end # /class Resource
+  end
 
+  # Provider for `application_git`.
+  #
+  # @since 1.0.0
+  # @see Resource
+  # @provides application_git
   class Provider < Chef::Provider::Git
     include PoiseApplication::AppMixin
     provides(:application_git)
 
+    # @api private
     def whyrun_supported?
       false # Just not dealing with this right now
     end
 
+    # Hack our special login in before load_current_resource runs because that
+    # needs access to the git remote.
+    #
+    # @api private
     def load_current_resource
       include_recipe('git')
       notifying_block do
@@ -95,6 +139,9 @@ module PoiseApplicationGit
 
     private
 
+    # Create a .ssh folder for the user.
+    #
+    # @return [void]
     def create_dotssh
       directory ::File.expand_path("~#{new_resource.user}/.ssh") do
         owner new_resource.user
@@ -103,6 +150,9 @@ module PoiseApplicationGit
       end
     end
 
+    # Copy the deploy key to a file if needed.
+    #
+    # @return [void]
     def write_deploy_key
       # Check if we have a local path or some actual content
       return if new_resource.deploy_key_is_local?
@@ -115,6 +165,9 @@ module PoiseApplicationGit
       end
     end
 
+    # Create the SSH wrapper script.
+    #
+    # @return [void]
     def write_ssh_wrapper
       # Write out the GIT_SSH script, it should already be enabled above
       file new_resource.ssh_wrapper_path do
@@ -131,5 +184,5 @@ module PoiseApplicationGit
     def git(*args, &block)
       Chef::Provider::Git.instance_method(:git).bind(self).call(*args, &block)
     end
-  end # /class Provider
+  end
 end
