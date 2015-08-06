@@ -19,6 +19,7 @@ require 'zlib'
 require 'chef/provider'
 require 'chef/resource'
 require 'poise_application/app_mixin'
+require 'poise_application/resources/application'
 
 require 'poise_application_git/safe_string'
 
