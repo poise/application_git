@@ -18,15 +18,14 @@ require 'zlib'
 
 require 'chef/provider'
 require 'chef/resource'
-require 'poise'
-require 'poise_application/resources/application'
+require 'poise_application/app_mixin'
 
 require 'poise_application_git/safe_string'
 
 
 module PoiseApplicationGit
   class Resource < Chef::Resource::Git
-    include Poise(parent: :application, parent_optional: true)
+    include PoiseApplication::AppMixin
     provides(:application_git)
 
     def initialize(*args)
@@ -77,7 +76,7 @@ module PoiseApplicationGit
   end # /class Resource
 
   class Provider < Chef::Provider::Git
-    include Poise
+    include PoiseApplication::AppMixin
     provides(:application_git)
 
     def whyrun_supported?
