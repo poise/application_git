@@ -1,4 +1,5 @@
-# application_git Changelog
+# Application_Git Changelog
 
 ## v1.0.0
 
+* Initial release.
