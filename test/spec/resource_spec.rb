@@ -94,4 +94,32 @@ describe PoiseApplicationGit::Resource do
 
     it { is_expected.to sync_application_git('https://example.com/test.git').with(destination: '/app', repository: 'https://example.com/test.git', revision: 'HEAD') }
   end # /context with a short name
+
+  context 'with an application owner' do
+    before do
+      expect_any_instance_of(PoiseApplicationGit::Provider).to receive(:remote_resolve_reference) {|instance| instance.new_resource.revision }
+    end
+    recipe do
+      application '/app' do
+        owner 'myuser'
+        application_git 'https://example.com/test.git'
+      end
+    end
+
+    it { is_expected.to sync_application_git('https://example.com/test.git').with(user: 'myuser') }
+  end # /context with an application owner
+
+  context 'with an application group' do
+    before do
+      expect_any_instance_of(PoiseApplicationGit::Provider).to receive(:remote_resolve_reference) {|instance| instance.new_resource.revision }
+    end
+    recipe do
+      application '/app' do
+        group 'mygroup'
+        application_git 'https://example.com/test.git'
+      end
+    end
+
+    it { is_expected.to sync_application_git('https://example.com/test.git').with(group: 'mygroup') }
+  end # /context with an application group
 end

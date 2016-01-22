@@ -50,12 +50,23 @@ module PoiseApplicationGit
       # resolver system instead.
       @resource_name = :application_git
       @provider = PoiseApplicationGit::Provider
+      # Clear defaults in older versions of Chef.
+      remove_instance_variable(:@group) if instance_variable_defined?(:@group)
+      remove_instance_variable(:@user) if instance_variable_defined?(:@user)
     end
 
+    # @!attribute group
+    #   Group to run git as. Defaults to the application group.
+    #   @return [String, Integer, nil, false]
+    attribute(:group, kind_of: [String, Integer, NilClass, FalseClass], default: lazy { parent && parent.group })
     # @!attribute strict_ssh
     #   Enable strict SSH host key checking. Defaults to false.
     #   @return [Boolean]
     attribute(:strict_ssh, equal_to: [true, false], default: false)
+    # @!attribute user
+    #   User to run git as. Defaults to the application owner.
+    #   @return [String, Integer, nil, false]
+    attribute(:user, kind_of: [String, Integer, NilClass, FalseClass], default: lazy { parent && parent.owner })
 
     # @api private
     def after_created
