@@ -31,4 +31,6 @@ dev_gem 'halite'
 dev_gem 'poise'
 dev_gem 'poise-application', path: '../application'
 dev_gem 'poise-boiler'
+dev_gem 'poise-profiler'
 dev_gem 'poise-service'
+
