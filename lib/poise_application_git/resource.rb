@@ -81,12 +81,8 @@ module PoiseApplicationGit
     #   SSH deploy key as either a string value or a path to a key file.
     #   @return [String]
     def deploy_key(val=nil)
-      if val
-        # Set the wrapper script if we have a deploy key.
-        ssh_wrapper(ssh_wrapper_path) if !ssh_wrapper
-        # Also use a SafeString for literal deploy keys so they aren't shown.
-        val = SafeString.new(val) unless deploy_key_is_local?(val)
-      end
+      # Use a SafeString for literal deploy keys so they aren't shown.
+      val = SafeString.new(val) if val && !deploy_key_is_local?(val)
       set_or_return(:deploy_key, val, kind_of: String)
     end
 
@@ -129,6 +125,14 @@ module PoiseApplicationGit
   class Provider < Chef::Provider::Git
     include PoiseApplication::AppMixin
     provides(:application_git)
+
+    # @api private
+    def initialize(*args)
+      super
+      # Set the SSH wrapper path in a late-binding kind of way. This better
+      # supports situations where the user doesn't exist until Chef converges.
+      new_resource.ssh_wrapper(new_resource.ssh_wrapper_path) if new_resource.deploy_key
+    end
 
     # @api private
     def whyrun_supported?

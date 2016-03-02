@@ -29,8 +29,8 @@ describe PoiseApplicationGit::Resource do
 
   before do
     # Don't actually run the real thing
-    expect_any_instance_of(PoiseApplicationGit::Provider).to receive(:action_sync).and_return(nil)
-    expect_any_instance_of(PoiseApplicationGit::Provider).to receive(:include_recipe).with('git').and_return(nil)
+    allow_any_instance_of(PoiseApplicationGit::Provider).to receive(:action_sync).and_return(nil)
+    allow_any_instance_of(PoiseApplicationGit::Provider).to receive(:include_recipe).with('git').and_return(nil)
     # Unwrap notifying_block
     allow_any_instance_of(PoiseApplicationGit::Provider).to receive(:notifying_block) {|&block| block.call }
   end
@@ -122,4 +122,19 @@ describe PoiseApplicationGit::Resource do
 
     it { is_expected.to sync_application_git('https://example.com/test.git').with(group: 'mygroup') }
   end # /context with an application group
+
+  context 'with a user that does not exist' do
+    recipe do
+      application_git '/test' do
+        action :nothing
+        user 'notauser'
+        repository 'https://example.com/test.git'
+        revision 'd44ec06d0b2a87732e91c005ed2048c824fd63ed'
+        deploy_key 'secretkey'
+      end
+    end
+
+    # Just make sure it doesn't crash on compile.
+    it { run_chef }
+  end # /context with a user that does not exist
 end
