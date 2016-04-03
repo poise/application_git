@@ -30,7 +30,7 @@ describe PoiseApplicationGit::Resource do
   before do
     # Don't actually run the real thing
     allow_any_instance_of(PoiseApplicationGit::Provider).to receive(:action_sync).and_return(nil)
-    allow_any_instance_of(PoiseApplicationGit::Provider).to receive(:include_recipe).with('git').and_return(nil)
+    allow_any_instance_of(PoiseApplicationGit::Provider).to receive(:install_git_recipe)
     # Unwrap notifying_block
     allow_any_instance_of(PoiseApplicationGit::Provider).to receive(:notifying_block) {|&block| block.call }
   end

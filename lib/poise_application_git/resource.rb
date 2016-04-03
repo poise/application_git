@@ -167,7 +167,7 @@ module PoiseApplicationGit
     def install_git
       return if @install_git
       Chef::Log.debug("[#{new_resource}] Installing git")
-      Poise::Helpers::IncludeRecipe.instance_method(:include_recipe).bind(self).call('git')
+      install_git_recipe
       notifying_block do
         Chef::Log.debug("[#{new_resource}] Creating deploy key")
         create_dotssh
@@ -175,6 +175,14 @@ module PoiseApplicationGit
         write_ssh_wrapper
       end if new_resource.deploy_key
       @install_git = true
+    end
+
+    # Run the include_recipe in a roundabout way because Chef's version is
+    # taking prority.
+    #
+    # @return [void]
+    def install_git_recipe
+      Poise::Helpers::IncludeRecipe.instance_method(:include_recipe).bind(self).call('git')
     end
 
     # Create a .ssh folder for the user.
