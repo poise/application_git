@@ -18,6 +18,7 @@ require 'zlib'
 
 require 'chef/provider'
 require 'chef/resource'
+require 'poise'
 require 'poise_application/app_mixin'
 require 'poise_application/resources/application'
 
@@ -144,16 +145,37 @@ module PoiseApplicationGit
     #
     # @api private
     def load_current_resource
-      include_recipe('git')
-      notifying_block do
-        create_dotssh
-        write_deploy_key
-        write_ssh_wrapper
-      end if new_resource.deploy_key
+      install_git
+      super
+    end
+
+    # Like {#load_current_resource}, make sure git is installed since we might
+    # need it depending on the version of Chef.
+    #
+    # @api private
+    def define_resource_requirements
+      install_git
       super
     end
 
     private
+
+    # Install git and set up the deploy key if needed. Safe to call multiple
+    # times if needed.
+    #
+    # @return [void]
+    def install_git
+      return if @install_git
+      Chef::Log.debug("[#{new_resource}] Installing git")
+      Poise::Helpers::IncludeRecipe.instance_method(:include_recipe).bind(self).call('git')
+      notifying_block do
+        Chef::Log.debug("[#{new_resource}] Creating deploy key")
+        create_dotssh
+        write_deploy_key
+        write_ssh_wrapper
+      end if new_resource.deploy_key
+      @install_git = true
+    end
 
     # Create a .ssh folder for the user.
     #
