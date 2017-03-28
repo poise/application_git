@@ -16,3 +16,6 @@
 
 require 'poise_boiler/spec_helper'
 require 'poise_application_git'
+require 'poise_git/cheftie'
+require 'poise_application/cheftie'
+require 'poise_application_git/cheftie'
